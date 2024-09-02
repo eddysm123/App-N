@@ -1,0 +1,154 @@
+-- ---
+-- Globals
+-- ---
+
+-- SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+-- SET FOREIGN_KEY_CHECKS=0;
+
+-- ---
+-- Table 'Usuarios'
+-- ---
+
+DROP TABLE IF EXISTS Usuarios;
+
+CREATE TABLE Usuarios (
+  id INT NOT NULL AUTO_INCREMENT,
+  Nombre VARCHAR(255) NULL DEFAULT NULL,
+  email VARCHAR(255) NULL DEFAULT NULL,
+  contraseña VARCHAR(255) NULL DEFAULT NULL,
+  nivel INT NULL DEFAULT NULL,
+  puntos_totales INT NULL DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Id_usuario';
+
+-- ---
+-- Table 'Actividades'
+-- ---
+
+DROP TABLE IF EXISTS Actividades;
+
+CREATE TABLE Actividades (
+  id INT NOT NULL AUTO_INCREMENT,
+  nombre VARCHAR(255) NULL DEFAULT NULL,
+  descripcion TEXT NULL DEFAULT NULL,
+  puntos INT NULL DEFAULT NULL,
+  id_categoria INT NULL DEFAULT NULL,
+  ubicacion VARCHAR(255) NULL DEFAULT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (id_categoria) REFERENCES Categorias(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Id_actividades';
+
+-- ---
+-- Table 'Validaciones'
+-- ---
+
+DROP TABLE IF EXISTS Validaciones;
+
+CREATE TABLE Validaciones (
+  id INT NOT NULL AUTO_INCREMENT,
+  id_actividades INT NULL DEFAULT NULL,
+  id_usuario INT NULL DEFAULT NULL,
+  metodo VARCHAR(255) NULL DEFAULT NULL,
+  estado VARCHAR(255) NULL DEFAULT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (id_actividades) REFERENCES Actividades(id),
+  FOREIGN KEY (id_usuario) REFERENCES Usuarios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Id_validaciones';
+
+-- ---
+-- Table 'Comentarios'
+-- ---
+
+DROP TABLE IF EXISTS Comentarios;
+
+CREATE TABLE Comentarios (
+  id INT NOT NULL AUTO_INCREMENT,
+  id_actividades INT NULL DEFAULT NULL,
+  id_usuario INT NULL DEFAULT NULL,
+  comentario TEXT NULL DEFAULT NULL,
+  calificacion INT NULL DEFAULT NULL,
+  fecha_comentario DATETIME NULL DEFAULT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (id_actividades) REFERENCES Actividades(id),
+  FOREIGN KEY (id_usuario) REFERENCES Usuarios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Id_comentarios';
+
+-- ---
+-- Table 'Categorias'
+-- ---
+
+DROP TABLE IF EXISTS Categorias;
+
+CREATE TABLE Categorias (
+  id INT NOT NULL AUTO_INCREMENT,
+  nombre VARCHAR(255) NULL DEFAULT NULL,
+  descripcion TEXT NULL DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Id_categorias';
+
+-- ---
+-- Table 'Recompensas'
+-- ---
+
+DROP TABLE IF EXISTS Recompensas;
+
+CREATE TABLE Recompensas (
+  id INT NOT NULL AUTO_INCREMENT,
+  nombre VARCHAR(255) NULL DEFAULT NULL,
+  descripcion TEXT NULL DEFAULT NULL,
+  puntos_requeridos INT NULL DEFAULT NULL,
+  PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Id_recompensas';
+
+-- ---
+-- Table 'Canjes'
+-- ---
+
+DROP TABLE IF EXISTS Canjes;
+
+CREATE TABLE Canjes (
+  id INT NOT NULL AUTO_INCREMENT,
+  id_usuario INT NOT NULL,
+  id_recompensa INT NOT NULL,
+  fecha_canje DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (id_usuario) REFERENCES Usuarios(id),
+  FOREIGN KEY (id_recompensa) REFERENCES Recompensas(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin COMMENT='Id_canjes';
+
+-- ---
+-- Table Properties
+-- ---
+
+-- ALTER TABLE Usuarios ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE Actividades ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE Validaciones ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE Comentarios ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE Categorias ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE Recompensas ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+-- ALTER TABLE Canjes ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+
+-- ---
+-- Test Data
+-- ---
+
+INSERT INTO Usuarios (id,Nombre,email,contraseña,nivel,puntos_totales) VALUES
+(NULL, 'John Doe', 'john.doe@example.com', 'password123', 1, 100);
+
+INSERT INTO Categorias (id,nombre,descripcion) VALUES
+(NULL, 'Environmental', 'Activities related to environmental protection.');
+
+INSERT INTO Actividades (id,nombre,descripcion,puntos,id_categoria,ubicacion) VALUES
+(NULL, 'Plant a Tree', 'Planting trees in the community.', 50, 1, 'Local Park');
+
+INSERT INTO Recompensas (id,nombre,descripcion,puntos_requeridos) VALUES
+(NULL, 'Eco Badge', 'A badge for eco-friendly actions.', 100);
+
+INSERT INTO Validaciones (id,id_actividades,id_usuario,metodo,estado) VALUES
+(NULL, 1, 1, 'Manual', 'Validated');
+
+INSERT INTO Comentarios (id,id_actividades,id_usuario,comentario,calificacion,fecha_comentario) VALUES
+(NULL, 1, 1, 'Great activity!', 5, NOW());
+
+INSERT INTO Canjes (id,id_usuario,id_recompensa,fecha_canje) VALUES
+(NULL, 1, 1, NOW());
