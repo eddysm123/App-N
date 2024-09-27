@@ -1,0 +1,184 @@
+// Importar los módulos necesarios
+const express = require('express');
+const mysql = require('mysql2');
+
+// Crear una aplicación Express
+const app = express();
+const port = 3000;
+
+// Middleware para parsear el cuerpo de las peticiones como JSON
+app.use(express.json());
+
+// Configuración de la conexión a MySQL
+const connection = mysql.createConnection({
+    host: 'localhost',
+    user: 'root', // Cambia esto según tu configuración de MySQL
+    password: 'elencuentro263', // Cambia esto según tu configuración
+    database: 'ecorewards' // Asegúrate de que esta sea la base de datos correcta
+});
+
+// Probar la conexión
+connection.connect((err) => {
+    if (err) {
+        console.error('Error conectando a MySQL:', err);
+        return;
+    }
+    console.log('Conectado a MySQL');
+});
+
+// RUTA: Obtener todas las actividades (GET)
+app.get('/actividades', (req, res) => {
+    console.log("Ruta /actividades llamada");
+    connection.query('SELECT * FROM actividades', (err, results) => {
+        if (err) {
+            console.error('Error en la consulta SQL', err); // Log de error
+            return res.status(500).json({ error: 'Error al recuperar actividades' });
+        }
+        console.log("Actividades recuperadas:", results); // Log de los resultados
+        res.json(results); // Devuelve las actividades en formato JSON
+    });
+});
+
+// RUTA: Añadir una nueva actividad (POST)
+app.post('/actividades', (req, res) => {
+    const { nombre, descripcion, puntos } = req.body;
+
+    if (!nombre || !puntos) {
+        return res.status(400).json({ error: 'Se requieren el nombre y los puntos' });
+    }
+
+    connection.query(
+        'INSERT INTO actividades (nombre, descripcion, puntos) VALUES (?, ?, ?)',
+        [nombre, descripcion, puntos],
+        (err, results) => {
+            if (err) {
+                console.error('Error en la consulta SQL', err); // Log de error
+                return res.status(500).json({ error: 'Error al añadir actividad' });
+            }
+            console.log("Actividad añadida con éxito, ID:", results.insertId); // Log de éxito
+            res.status(201).json({ message: 'Actividad añadida exitosamente', id: results.insertId });
+        }
+    );
+});
+
+// RUTA: Actualizar una actividad (PUT)
+app.put('/actividades/:id', (req, res) => {
+    const { id } = req.params;
+    const { nombre, descripcion, puntos } = req.body;
+
+    connection.query(
+        'UPDATE actividades SET nombre = ?, descripcion = ?, puntos = ? WHERE id = ?',
+        [nombre, descripcion, puntos, id],
+        (err, results) => {
+            if (err) {
+                console.error('Error en la consulta SQL', err); // Log de error
+                return res.status(500).json({ error: 'Error al actualizar actividad' });
+            }
+            if (results.affectedRows === 0) {
+                return res.status(404).json({ error: 'Actividad no encontrada' });
+            }
+            res.json({ message: 'Actividad actualizada exitosamente' });
+        }
+    );
+});
+
+// RUTA: Eliminar una actividad (DELETE)
+app.delete('/actividades/:id', (req, res) => {
+    const { id } = req.params;
+
+    connection.query(
+        'DELETE FROM actividades WHERE id = ?',
+        [id],
+        (err, results) => {
+            if (err) {
+                console.error('Error en la consulta SQL', err); // Log de error
+                return res.status(500).json({ error: 'Error al eliminar actividad' });
+            }
+            if (results.affectedRows === 0) {
+                return res.status(404).json({ error: 'Actividad no encontrada' });
+            }
+            res.json({ message: 'Actividad eliminada exitosamente' });
+        }
+    );
+});
+
+// RUTA: Obtener todas las recompensas (GET)
+app.get('/recompensas', (req, res) => {
+    console.log("Ruta /recompensas llamada");
+    connection.query('SELECT * FROM recompensas', (err, results) => {
+        if (err) {
+            console.error('Error en la consulta SQL', err); // Log de error
+            return res.status(500).json({ error: 'Error al recuperar recompensas' });
+        }
+        console.log("Recompensas recuperadas:", results); // Log de los resultados
+        res.json(results); // Devuelve las recompensas en formato JSON
+    });
+});
+
+// RUTA: Añadir una nueva recompensa (POST)
+app.post('/recompensas', (req, res) => {
+    const { nombre, puntos_requeridos } = req.body;
+
+    if (!nombre || !puntos_requeridos) {
+        return res.status(400).json({ error: 'Se requieren el nombre y los puntos requeridos' });
+    }
+
+    connection.query(
+        'INSERT INTO recompensas (nombre, puntos_requeridos) VALUES (?, ?)',
+        [nombre, puntos_requeridos],
+        (err, results) => {
+            if (err) {
+                console.error('Error en la consulta SQL', err); // Log de error
+                return res.status(500).json({ error: 'Error al añadir recompensa' });
+            }
+            console.log("Recompensa añadida con éxito, ID:", results.insertId); // Log de éxito
+            res.status(201).json({ message: 'Recompensa añadida exitosamente', id: results.insertId });
+        }
+    );
+});
+
+// RUTA: Actualizar una recompensa (PUT)
+app.put('/recompensas/:id', (req, res) => {
+    const { id } = req.params;
+    const { nombre, puntos_requeridos } = req.body;
+
+    connection.query(
+        'UPDATE recompensas SET nombre = ?, puntos_requeridos = ? WHERE id = ?',
+        [nombre, puntos_requeridos, id],
+        (err, results) => {
+            if (err) {
+                console.error('Error en la consulta SQL', err); // Log de error
+                return res.status(500).json({ error: 'Error al actualizar recompensa' });
+            }
+            if (results.affectedRows === 0) {
+                return res.status(404).json({ error: 'Recompensa no encontrada' });
+            }
+            res.json({ message: 'Recompensa actualizada exitosamente' });
+        }
+    );
+});
+
+// RUTA: Eliminar una recompensa (DELETE)
+app.delete('/recompensas/:id', (req, res) => {
+    const { id } = req.params;
+
+    connection.query(
+        'DELETE FROM recompensas WHERE id = ?',
+        [id],
+        (err, results) => {
+            if (err) {
+                console.error('Error en la consulta SQL', err); // Log de error
+                return res.status(500).json({ error: 'Error al eliminar recompensa' });
+            }
+            if (results.affectedRows === 0) {
+                return res.status(404).json({ error: 'Recompensa no encontrada' });
+            }
+            res.json({ message: 'Recompensa eliminada exitosamente' });
+        }
+    );
+});
+
+// Iniciar el servidor
+app.listen(port, () => {
+    console.log(Servidor corriendo en http://localhost:${port});
+});
